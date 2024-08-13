@@ -13,26 +13,26 @@ Start by forking the repository to your own GitHub account. This allows you to f
 
 Clone your fork to your local machine:
 
-\`\`\`bash
+```bash
 git clone https://github.com/YOUR-USERNAME/aws_operations.git
 cd aws_operations
-\`\`\`
+```
 
 ### 3. Set Up the Environment
 
 Ensure you have Ansible installed and set up. You may also need to install any required collections:
 
-\`\`\`bash
+```bash
 ansible-galaxy collection install amazon.aws
-\`\`\`
+```
 
 ### 4. Create a Branch
 
 Create a new branch for your changes. Use a descriptive name that summarizes your changes:
 
-\`\`\`bash
+```bash
 git checkout -b feature/new-awesome-feature
-\`\`\`
+```
 
 ## Making Changes
 
@@ -62,18 +62,18 @@ Update the documentation to reflect any new features or changes you’ve made:
 
 Commit your changes with a descriptive message:
 
-\`\`\`bash
+```bash
 git add .
 git commit -m "Add feature X to improve Y"
-\`\`\`
+```
 
 ### 2. Push Your Changes
 
 Push your branch to your fork on GitHub:
 
-\`\`\`bash
+```bash
 git push origin feature/new-awesome-feature
-\`\`\`
+```
 
 ### 3. Open a Pull Request
 
