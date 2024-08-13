@@ -9,6 +9,8 @@ on:
 jobs:
   configure-controller:
     runs-on: ubuntu-latest
+    container:
+      image: ansible/ansible-runner:latest
 
     steps:
       - name: Checkout Repository
