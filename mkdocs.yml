@@ -1,0 +1,3 @@
+site_name: 'AWS Operations Documentation'
+nav:
+  - Home: index.md
