@@ -8,14 +8,18 @@
     instance_type: "t3.small"
     region: "ap-south-1"
     key_name: "anshul-test"  # Replace with your key pair
-    teardown: true  # Set to true for teardown
-    survey_size: 20
+    volume_size: 20
     ami_os: "RHEL8"
     survey_teardown_response: "no"
     tag_name: "anshul-aws-resources"
   vars_files:
     - mapping.yml
   tasks:
+    - name: Fail if volume_size is greater than 40GB
+      ansible.builtin.fail:
+        msg: volume_size cannot be greater than 40gb
+      when: volume_size > 40
+
     - name: Set AMI ID based on region and OS version
       ansible.builtin.set_fact:
         ami_id: "{{ ami_mapping[region][ami_os] }}"
@@ -172,7 +176,7 @@
         device_name: /dev/sdf
         region: "{{ region }}"
         state: present
-        volume_size: "{{ survey_size }}"
+        volume_size: "{{ volume_size }}"
         delete_on_termination: true
         name: "{{ tag_name }}-storage"
       when: not teardown

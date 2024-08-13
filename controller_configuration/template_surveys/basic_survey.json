@@ -22,7 +22,7 @@
         "required": true,
         "choices": "",
         "new_question": true,
-        "variable": "survey_size",
+        "variable": "volume_size",
         "question_name": "Choose volume size",
         "type": "text"
       },
