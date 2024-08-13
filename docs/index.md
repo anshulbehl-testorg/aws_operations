@@ -1,4 +1,4 @@
-# AWS Operations Role: `aws.aws_operations.run`
+# AWS Operations Role: `{{ extra.collection_name }}.run`
 
 ## Overview
 
@@ -65,6 +65,6 @@ To use this role in your playbook, include it as follows:
 ---
 - hosts: localhost
   roles:
-    - role: aws.aws_operations.run
+    - role: {{ extra.collection_name }}.run
 ```
 
