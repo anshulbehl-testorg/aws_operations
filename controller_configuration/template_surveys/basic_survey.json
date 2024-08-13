@@ -12,7 +12,19 @@
         "choices": "",
         "new_question": true,
         "variable": "tag_name",
-        "question_name": "Tag Name",
+        "question_name": "Instance Name",
+        "type": "text"
+      },
+      {
+        "question_description": "Volume size(Size < 40GB allowed)",
+        "min": 0,
+        "default": "10",
+        "max": 128,
+        "required": true,
+        "choices": "",
+        "new_question": true,
+        "variable": "survey_size",
+        "question_name": "Choose volume size",
         "type": "text"
       },
       {
@@ -40,7 +52,19 @@
         "type": "multiplechoice"
       },
       {
-        "question_description": "Teardown?",
+        "question_description": "Choosing Instance Type",
+        "min": 0,
+        "default": "t3.small",
+        "max": 0,
+        "required": true,
+        "choices": "t2.micro\nt2.small\nt3.small",
+        "new_question": true,
+        "variable": "region",
+        "question_name": "Choose instance type",
+        "type": "multiplechoice"
+      },
+      {
+        "question_description": "Choose yes or no?",
         "min": 0,
         "default": "no",
         "max": 0,
@@ -48,7 +72,7 @@
         "choices": "yes\nno",
         "new_question": true,
         "variable": "survey_teardown_response",
-        "question_name": "Choose yes or no?",
+        "question_name": "Teardown?",
         "type": "multiplechoice"
       }
     ]
