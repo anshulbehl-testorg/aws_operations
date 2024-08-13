@@ -24,7 +24,7 @@
         "new_question": true,
         "variable": "volume_size",
         "question_name": "Choose volume size",
-        "type": "text"
+        "type": "integer"
       },
       {
         "question_description": "Choose Operating system",
