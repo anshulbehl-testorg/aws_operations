@@ -1,0 +1,36 @@
+name: Configure Controller Projects and Jobs
+
+on:
+  push:
+    branches:
+      - devel
+  workflow_dispatch:
+
+jobs:
+  configure-controller:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Ansible
+        run: sudo apt-get update && sudo apt-get install -y ansible-core && sudo wget https://github.com/mikefarah/yq/releases/download/v4.12.2/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
+
+
+      - name: Update Project and Job Template Names
+        run: |
+          ls -al
+          repo_name=$(basename ${{ github.event.repository.clone_url }} .git)
+          git_url="${{ github.event.repository.clone_url }}"
+          yq e -i ".controller_projects[0].name = \"$(echo [DEV]BLUEPRINT PROJ-$repo_name | tr '[:lower:]' '[:upper:]')\"" controller_configuration/yaml/controller_config.yml
+          yq e -i ".controller_projects[0].scm_url = \"$git_url\"" controller_configuration/yaml/controller_config.yml
+          yq e -i ".controller_templates[0].name = \"$(echo [DEV]BLUEPRINT \/ $repo_name | tr '[:lower:]' '[:upper:]')\"" controller_configuration/yaml/controller_config.yml
+          yq e -i ".controller_templates[0].project = \"$(echo [DEV]BLUEPRINT PROJ-$repo_name | tr '[:lower:]' '[:upper:]')\"" controller_configuration/yaml/controller_config.yml
+
+      - name: Run Ansible Playbook to Configure Controller
+        run: ansible-galaxy collection install infra.controller_configuration && ansible-playbook controller_configuration/controller_configuration.yml
+        env:
+          CONTROLLER_HOST: ${{ secrets.CONTROLLER_HOST }}
+          CONTROLLER_USERNAME: ${{ secrets.CONTROLLER_USERNAME }}
+          CONTROLLER_PASSWORD: ${{ secrets.CONTROLLER_PASSWORD }}

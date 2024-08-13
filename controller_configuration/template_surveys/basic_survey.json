@@ -1,0 +1,55 @@
+{
+
+    "name": "AWS Survey",
+    "description": "AWS Survey",
+    "spec": [
+      {
+        "question_description": "Tag Name",
+        "min": 0,
+        "default": "",
+        "max": 128,
+        "required": true,
+        "choices": "",
+        "new_question": true,
+        "variable": "tag_name",
+        "question_name": "Tag Name",
+        "type": "text"
+      },
+      {
+        "question_description": "Choose Operating system",
+        "min": 0,
+        "default": "RHEL8",
+        "max": 0,
+        "required": true,
+        "choices": "RHEL8\nRHEL9",
+        "new_question": true,
+        "variable": "ami_os",
+        "question_name": "Select Group:",
+        "type": "multiplechoice"
+      },
+      {
+        "question_description": "Choosing Region",
+        "min": 0,
+        "default": "ap-south-1",
+        "max": 0,
+        "required": true,
+        "choices": "us-east-1\nap-south-1\nus-west-2",
+        "new_question": true,
+        "variable": "region",
+        "question_name": "Choose AWS Region",
+        "type": "multiplechoice"
+      },
+      {
+        "question_description": "Teardown?",
+        "min": 0,
+        "default": "no",
+        "max": 0,
+        "required": true,
+        "choices": "yes\nno",
+        "new_question": true,
+        "variable": "survey_teardown_response",
+        "question_name": "Choose yes or no?",
+        "type": "multiplechoice"
+      }
+    ]
+  }

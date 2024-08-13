@@ -1,0 +1,25 @@
+---
+controller_projects:
+- name: tmp_proj_name
+  organization: "Globo Financial Service"
+  allow_override: 'yes'
+  scm_branch: main
+  scm_clean: 'no'
+  scm_delete_on_update: 'no'
+  scm_type: git
+  scm_update_on_launch: 'no'
+  scm_url: tmp_proj_url
+
+controller_templates:
+- name: tmp_jt_name
+  job_type: run
+  inventory: Demo Inventory
+  execution_environment: "AWS EE"
+  survey_enabled: true
+  survey: "{{ lookup('template', 'template_surveys/basic_survey.json') | regex_replace('\\n', '') }}"
+  project: tmp_proj_name
+  playbook: aws_playbook.yml
+  organization: "Globo Financial Service"
+  ask_scm_branch_on_launch: 'yes'
+  credentials:
+  - AWS Credential

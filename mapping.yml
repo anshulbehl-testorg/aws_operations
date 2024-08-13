@@ -1,0 +1,14 @@
+ami_mapping:
+  us-east-1:
+    RHEL8: ami-0b98e4baa65866e4a
+    RHEL9: ami-07f649370edde1945
+  us-west-2:
+    RHEL8: ami-06d6f906f3326e99b
+    RHEL9: ami-0ea562e794fee45c6
+  ap-south-1:
+    RHEL8: ami-03c322da7f85cfd86
+    RHEL9: ami-02c1ed6aaf44207bb
+
+teardown_mapping:
+  "yes": true
+  "no": false
