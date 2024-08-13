@@ -41,3 +41,9 @@ projects:
         origin: https://github.com/anshulbehl-testorg/aws_operations.git
       checkoutFrom:
         revision: devel
+  - name: aws-operations
+    git:
+      remotes:
+        origin: https://github.com/anshulbehl-testorg/aws_operations.git
+      checkoutFrom:
+        revision: devel
