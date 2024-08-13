@@ -5,10 +5,14 @@
   vars:
     vpc_cidr: "10.0.0.0/16"
     subnet_cidr: "10.0.1.0/24"
-    instance_type: "t2.small"
+    instance_type: "t3.small"
     region: "ap-south-1"
     key_name: "anshul-test"  # Replace with your key pair
     teardown: true  # Set to true for teardown
+    survey_size: 20
+    ami_os: "RHEL8"
+    survey_teardown_response: "no"
+    tag_name: "anshul-aws-resources"
   vars_files:
     - mapping.yml
   tasks:
@@ -47,6 +51,7 @@
         vpc_id: "{{ vpc_id | default(vpc.vpc.id) }}"
         cidr: "{{ subnet_cidr }}"
         region: "{{ region }}"
+        map_public: true
         tags:
           Name: "{{ tag_name }}-subnet"
       when: not teardown
@@ -61,15 +66,57 @@
       when: not teardown
       register: igw
 
-    - name: Create Internet Gateway if not exists and attach to VPC
-      amazon.aws.ec2_vpc_igw:
-        vpc_id: "{{ vpc_id | default(vpc.vpc.id) }}"
+    - name: Gather route table information
+      amazon.aws.ec2_vpc_route_table_info:
+        filters:
+          association.main: true
+          vpc-id: "{{ vpc_id | default(vpc.vpc.id) }}"
         region: "{{ region }}"
-        state: present
-        tags:
-          Name: "{{ tag_name }}-igw"
+      register: route_table_info
       when: not teardown
-      register: igw
+
+    - name: Check if route to Internet Gateway already exists
+      ansible.builtin.set_fact:
+        route_exists: >-
+          {{
+            route_table_info.route_tables[0].routes
+            | selectattr('destination_cidr_block', 'equalto', '0.0.0.0/0')
+            | map(attribute='gateway_id')
+            | list
+            | length > 0
+          }}
+      when: not teardown
+
+    - name: Add a route to the Internet Gateway if it doesn't exist
+      amazon.aws.ec2_vpc_route_table:
+        route_table_id: "{{ route_table_info.route_tables[0].route_table_id }}"
+        region: "{{ region }}"
+        vpc_id: "{{ vpc_id | default(vpc.vpc.id) }}"
+        lookup: id
+        routes:
+          - dest: "0.0.0.0/0"
+            gateway_id: "{{ igw.gateway_id }}"
+      when: route_exists is defined and not route_exists and not teardown
+
+    # - name: Get the route table associated with the subnet
+    #   amazon.aws.ec2_vpc_route_table_info:
+    #     filters:
+    #       vpc-id: "{{ vpc_id | default(vpc.vpc.id) }}"
+    #     region: "{{ region }}"
+    #   register: route_table_info
+    #   when: not teardown
+
+    # - name: Add a route to the Internet Gateway
+    #   amazon.aws.ec2_vpc_route_table:
+    #     route_table_id: "{{ route_table_info.route_tables[0].associations[0].route_table_id }}"
+    #     region: "{{ region }}"
+    #     vpc_id: "{{ vpc_id | default(vpc.vpc.id) }}"
+    #     subnets:
+    #       - "{{ subnet.subnet.id }}"
+    #     routes:
+    #       - dest: "0.0.0.0/0"
+    #         gateway_id: "{{ igw.gateway_id }}"
+    #   when: not teardown
 
     - name: Create Security Group if not exists
       amazon.aws.ec2_security_group:
@@ -108,6 +155,9 @@
         key_name: "{{ key_name }}"
         instance_type: "{{ instance_type }}"
         image_id: "{{ ami_id }}"
+        network:
+          assign_public_ip: true
+          vpc_subnet_id: "{{ subnet.subnet.id }}"
         vpc_subnet_id: "{{ subnet.subnet.id }}"
         security_group: "{{ security_group.group_id }}"
         region: "{{ region }}"
@@ -116,38 +166,30 @@
       when: not teardown
       register: ec2_instance
 
-    # - name: Create Volume if not exists
-    #   amazon.aws.ec2_vol:
-    #     region: "{{ region }}"
-    #     zone: "{{ region }}a"
-    #     volume_size: 10  # Size in GB
-    #     volume_type: gp2
-    #     device_name: /dev/sdf
-    #   when: not teardown
-    #   register: volume
-
-    # - name: Attach Volume to EC2 Instance
-    #   amazon.aws.ec2_vol:
-    #     id: "{{ volume.volume_id }}"
-    #     instance: "{{ ec2_instance.instances[0].instance_id }}"
-    #     device_name: /dev/sdf
-    #     region: "{{ region }}"
-    #     state: present
-    #   when: not teardown
+    - name: Attach Volume to EC2 Instance
+      amazon.aws.ec2_vol:
+        instance: "{{ ec2_instance.instances[0].instance_id }}"
+        device_name: /dev/sdf
+        region: "{{ region }}"
+        state: present
+        volume_size: "{{ survey_size }}"
+        delete_on_termination: true
+        name: "{{ tag_name }}-storage"
+      when: not teardown
 
     - name: Find EC2 instances by tag
       amazon.aws.ec2_instance_info:
         filters:
           "tag:Name": "{{ tag_name }}-instance"
         region: "{{ region }}"
-      register: ec2_info
+      register: ec2_instance_final
 
     - name: Terminate EC2 instance
       amazon.aws.ec2_instance:
-        instance_ids: "{{ ec2_info.instances | map(attribute='instance_id') | list }}"
+        instance_ids: "{{ ec2_instance_final.instances | map(attribute='instance_id') | list }}"
         region: "{{ region }}"
         state: absent
-      when: teardown and ec2_info.instances | length > 0
+      when: teardown and ec2_instance_final.instances | length > 0
 
     # - name: Teardown - Delete Load Balancer
     #   amazon.aws.elb_application_lb:
@@ -184,11 +226,12 @@
           cidr-block: "{{ subnet_cidr }}"
         region: "{{ region }}"
       register: subnet_info
+      when: vpc_info.vpcs | length > 0
 
     - name: Set Subnet ID if Found
       ansible.builtin.set_fact:
         subnet_id: "{{ subnet_info.subnets[0].subnet_id }}"
-      when: subnet_info.subnets | length > 0
+      when: subnet_info.subnets is defined and subnet_info.subnets | length > 0
 
     - name: Teardown - Delete Subnet
       amazon.aws.ec2_vpc_subnet:
@@ -205,9 +248,42 @@
         region: "{{ region }}"
       when: teardown and vpc_info.vpcs | length > 0
 
+    - name: Get the route table associated with the subnet
+      amazon.aws.ec2_vpc_route_table_info:
+        filters:
+          vpc-id: "{{ vpc_info.vpcs[0].vpc_id }}"
+        region: "{{ region }}"
+      register: route_tables_info
+      when: vpc_info.vpcs | length > 0
+
+    - name: Delete each route table
+      amazon.aws.ec2_vpc_route_table:
+        route_table_id: "{{ item.route_table_id }}"
+        region: "{{ region }}"
+        vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
+        lookup: id
+        state: absent
+      loop: "{{ route_tables_info.route_tables }}"
+      when: teardown and vpc_info.vpcs | length > 0
+      failed_when: false
+
     - name: Teardown - Delete VPC
       amazon.aws.ec2_vpc_net:
         vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
         region: "{{ region }}"
         state: absent
       when: teardown and vpc_info.vpcs | length > 0
+
+
+    - name: Print instance details
+      ansible.builtin.debug:
+        msg:
+          - "Instance ID:          {{ ec2_instance.instances[0].instance_id }}"
+          - "Public IP:            {{ ec2_instance.instances[0].public_ip_address }}"
+          - "Private IP:           {{ ec2_instance.instances[0].private_ip_address }}"
+          - "Availability Zone:    {{ ec2_instance.instances[0].placement.availability_zone }}"
+          - "Instance Type:        {{ ec2_instance.instances[0].instance_type }}"
+          - "Key Name:             {{ ec2_instance.instances[0].key_name }}"
+          - "Launch Time:          {{ ec2_instance.instances[0].launch_time }}"
+          - "Security Groups:      {{ ec2_instance.instances[0].security_groups | map(attribute='group_name') | join(', ') }}"
+      when: not teardown
