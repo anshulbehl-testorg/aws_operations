@@ -4,3 +4,5 @@ nav:
   - Overview: overview.md
   - Setup: setup.md
   - Contributing: contributing.md
+extra:
+  collection_name: aws.aws_operations
