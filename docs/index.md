@@ -64,6 +64,7 @@ To use this role in your playbook, include it as follows:
 ```yaml
 ---
 - hosts: localhost
-```
   roles:
     - role: aws.aws_operations.run
+```
+
