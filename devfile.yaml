@@ -34,10 +34,4 @@ events:
     - install-collections
     - install-python-dependencies
     - configure-git
-projects:
-  - name: Demo Project
-    git:
-      remotes:
-        origin: https://github.com/anshulbehl-testorg/aws_operations.git
-      checkoutFrom:
-        revision: devel
+
