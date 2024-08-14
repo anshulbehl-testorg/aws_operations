@@ -1,0 +1,19 @@
+---
+- name: Find EC2 instances by tag
+  amazon.aws.ec2_instance_info:
+    filters:
+      "tag:Name": "{{ tag_name }}-instance"
+    region: "{{ region }}"
+  register: ec2_instance
+
+- name: Print instance details
+  ansible.builtin.debug:
+    msg:
+      - "Instance ID:          {{ ec2_instance.instances[1].instance_id }}"
+      - "Public IP:            {{ ec2_instance.instances[1].public_ip_address }}"
+      - "Private IP:           {{ ec2_instance.instances[1].private_ip_address }}"
+      - "Availability Zone:    {{ ec2_instance.instances[1].placement.availability_zone }}"
+      - "Instance Type:        {{ ec2_instance.instances[1].instance_type }}"
+      - "Key Name:             {{ ec2_instance.instances[1].key_name }}"
+      - "Launch Time:          {{ ec2_instance.instances[1].launch_time }}"
+      - "Security Groups:      {{ ec2_instance.instances[1].security_groups | map(attribute='group_name') | join(', ') }}"

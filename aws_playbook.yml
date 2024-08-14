@@ -1,8 +1,10 @@
 ---
-- name: AWS Infrastructure Management
+- name: Example AWS Operations playbook
   hosts: localhost
-  gather_facts: true
   vars:
-    - key_name: "anshul-test"
+    key_name: "anshul-test"
   roles:
     - role: aws.aws_operations.run
+  tasks:
+    - ansible.builtin.include_role:
+        name: aws.aws_operations.run

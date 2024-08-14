@@ -1,37 +1,25 @@
 ---
-- name: Set AMI ID based on region and OS version
-  ansible.builtin.set_fact:
-    ami_id: "{{ run_ami_mapping[region][ami_os] }}"
-
-- name: Set teardown boolean based on survey input
-  ansible.builtin.set_fact:
-    teardown: "{{ run_teardown_mapping[teardown_response | lower] }}"
-
 - name: Run network tasks
   ansible.builtin.import_tasks:
     file: 10_network.yml
+  tags: network
 
 - name: Run security group tasks
   ansible.builtin.import_tasks:
     file: 20_security_groups.yml
+  tags: sg
 
 - name: Create ec2 instance
   ansible.builtin.import_tasks:
     file: 30_ec2_instance.yml
+  tags: ec2
 
 - name: Run teardown tasks
   ansible.builtin.import_tasks:
     file: 40_teardown.yml
+  tags: teardown
 
-- name: Print instance details
-  ansible.builtin.debug:
-    msg:
-      - "Instance ID:          {{ ec2_instance.instances[0].instance_id }}"
-      - "Public IP:            {{ ec2_instance.instances[0].public_ip_address }}"
-      - "Private IP:           {{ ec2_instance.instances[0].private_ip_address }}"
-      - "Availability Zone:    {{ ec2_instance.instances[0].placement.availability_zone }}"
-      - "Instance Type:        {{ ec2_instance.instances[0].instance_type }}"
-      - "Key Name:             {{ ec2_instance.instances[0].key_name }}"
-      - "Launch Time:          {{ ec2_instance.instances[0].launch_time }}"
-      - "Security Groups:      {{ ec2_instance.instances[0].security_groups | map(attribute='group_name') | join(', ') }}"
-  when: not teardown
+- name: Print Instance details
+  ansible.builtin.import_tasks:
+    file: 50_instance_details.yml
+  tags: details
