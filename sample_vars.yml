@@ -1,7 +1,8 @@
 ---
+# Make sure these variable name map exactly to the survey variables
 instance_type: "t3.small"
 region: "ap-south-1"
-key_name: "anshul-test"  # Replace with your key pair
+key_name: "anshul-test"
 ami_os: "RHEL8"
 teardown_response: "yes"
 tag_name: "anshul-aws-resources"
