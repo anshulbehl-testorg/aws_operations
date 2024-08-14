@@ -45,7 +45,7 @@
   amazon.aws.ec2_vpc_subnet_info:
     filters:
       vpc-id: "{{ vpc_info.vpcs[0].vpc_id }}"
-      cidr-block: "{{ subnet_cidr }}"
+      cidr-block: "{{ run_subnet_cidr }}"
     region: "{{ region }}"
   register: subnet_info
   when: vpc_info.vpcs | length > 0
@@ -59,7 +59,7 @@
   amazon.aws.ec2_vpc_subnet:
     region: "{{ region }}"
     vpc_id: "{{ vpc_info.vpcs[0].vpc_id }}"
-    cidr: "{{ subnet_cidr }}"
+    cidr: "{{ run_subnet_cidr }}"
     state: absent
   when: teardown and subnet_id is defined
 
