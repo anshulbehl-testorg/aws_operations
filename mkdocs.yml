@@ -1,8 +1,9 @@
-site_name: 'AWS Operations Documentation'
+---
+site_name: AWS Operations Documentation
 nav:
   - Home: index.md
   - Overview: overview.md
   - Setup: setup.md
   - Contributing: contributing.md
 extra:
-  collection_name: "aws.aws_operations"
+  collection_name: aws.aws_operations
