@@ -1,7 +1,4 @@
 ---
-- name: Set teardown boolean based on survey input
-  ansible.builtin.set_fact:
-    teardown: "{{ run_teardown_mapping[teardown_response | lower] }}"
 
 - name: Search for existing VPC
   amazon.aws.ec2_vpc_net_info:
