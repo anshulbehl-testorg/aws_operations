@@ -3,7 +3,7 @@ controller_projects:
 - name: tmp_proj_name
   organization: "Globo Financial Service"
   allow_override: 'yes'
-  scm_branch: main
+  scm_branch: devel
   scm_clean: 'no'
   scm_delete_on_update: 'no'
   scm_type: git
@@ -20,6 +20,6 @@ controller_templates:
   project: tmp_proj_name
   playbook: aws_playbook.yml
   organization: "Globo Financial Service"
-  ask_scm_branch_on_launch: 'yes'
+  ask_scm_branch_on_launch: 'no'
   credentials:
   - AWS Credential

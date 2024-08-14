@@ -2,5 +2,7 @@
 - name: AWS Infrastructure Management
   hosts: localhost
   gather_facts: true
+  vars:
+    - key_name: "anshul-test"
   roles:
     - role: aws.aws_operations.run
