@@ -3,7 +3,7 @@
     "description": "AWS Survey",
     "spec": [
       {
-        "question_description": "Tag Name",
+        "question_description": "Instance Name",
         "min": 0,
         "default": "",
         "max": 128,
@@ -15,16 +15,16 @@
         "type": "text"
       },
       {
-        "question_description": "Volume size(Size < 40GB allowed)",
+        "question_description": "Choose Instance Type",
         "min": 0,
-        "default": "10",
-        "max": 128,
+        "default": "t3.small",
+        "max": 0,
         "required": true,
-        "choices": "",
+        "choices": "t2.micro\nt2.small\nt3.small",
         "new_question": true,
-        "variable": "volume_size",
-        "question_name": "Choose volume size",
-        "type": "integer"
+        "variable": "instance_type",
+        "question_name": "Choose instance type",
+        "type": "multiplechoice"
       },
       {
         "question_description": "Choose Operating system",
@@ -51,18 +51,6 @@
         "type": "multiplechoice"
       },
       {
-        "question_description": "Choose Instance Type",
-        "min": 0,
-        "default": "t3.small",
-        "max": 0,
-        "required": true,
-        "choices": "t2.micro\nt2.small\nt3.small",
-        "new_question": true,
-        "variable": "instance_type",
-        "question_name": "Choose instance type",
-        "type": "multiplechoice"
-      },
-      {
         "question_description": "Choose yes or no?",
         "min": 0,
         "default": "no",
@@ -70,7 +58,7 @@
         "required": true,
         "choices": "yes\nno",
         "new_question": true,
-        "variable": "survey_teardown_response",
+        "variable": "teardown_response",
         "question_name": "Teardown?",
         "type": "multiplechoice"
       }

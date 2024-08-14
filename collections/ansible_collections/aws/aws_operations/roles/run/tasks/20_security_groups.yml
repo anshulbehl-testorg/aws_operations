@@ -1,0 +1,18 @@
+---
+- name: Create Security Group if not exists
+  amazon.aws.ec2_security_group:
+    name: "{{ tag_name }}-sg"
+    description: "Security group for {{ tag_name }}"
+    vpc_id: "{{ vpc_id | default(vpc.vpc.id) }}"
+    region: "{{ region }}"
+    tags:
+      Name: "{{ tag_name }}-sg"
+    rules:
+      - proto: tcp
+        ports:
+          - 22
+          - 80
+          - 443
+        cidr_ip: "0.0.0.0/0"
+  when: not teardown
+  register: security_group

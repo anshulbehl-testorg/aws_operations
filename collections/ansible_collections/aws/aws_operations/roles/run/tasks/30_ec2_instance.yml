@@ -1,0 +1,28 @@
+---
+- name: Create EC2 Instance if not exists
+  amazon.aws.ec2_instance:
+    name: "{{ tag_name }}-instance"
+    key_name: "{{ key_name }}"
+    instance_type: "{{ instance_type }}"
+    image_id: "{{ ami_id }}"
+    network:
+      assign_public_ip: true
+      vpc_subnet_id: "{{ subnet.subnet.id }}"
+    vpc_subnet_id: "{{ subnet.subnet.id }}"
+    security_group: "{{ security_group.group_id }}"
+    region: "{{ region }}"
+    tags:
+      Name: "{{ tag_name }}-instance"
+  when: not teardown
+  register: ec2_instance
+
+# - name: Attach Volume to EC2 Instance
+#   amazon.aws.ec2_vol:
+#     instance: "{{ ec2_instance.instances[0].instance_id }}"
+#     device_name: /dev/sdf
+#     region: "{{ region }}"
+#     state: present
+#     volume_size: "{{ volume_size }}"
+#     delete_on_termination: true
+#     name: "{{ tag_name }}-storage"
+#   when: not teardown
